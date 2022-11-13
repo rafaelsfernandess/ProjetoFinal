@@ -5,6 +5,15 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -15,6 +24,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -24,6 +34,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.LineBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableColumnModel;
 
 import br.com.empresa.dao.Dados;
@@ -36,6 +47,7 @@ import br.com.empresa.view.util.RowData;
 import br.com.empresa.view.util.TableModel;
 import br.com.empresa.vo.ProdutoVO;
 import br.com.empresa.vo.enums.StatusEnum;
+
 
 public class ConsultaProdutoView extends JDialog {
 
@@ -57,7 +69,7 @@ public class ConsultaProdutoView extends JDialog {
 
 		servicoBeanLocal = new ServicoBeanLocal();
 
-		setBounds(100, 100, 656, 443);
+		setBounds(100, 100, 674, 443);
 		getContentPane().setLayout(null);
 
 		JPanel panel = new JPanel();
@@ -158,7 +170,7 @@ public class ConsultaProdutoView extends JDialog {
 				fecharJanela();
 			}
 		});
-		btnFechar.setBounds(525, 377, 117, 25);
+		btnFechar.setBounds(525, 369, 117, 25);
 		getContentPane().add(btnFechar);
 
 		JScrollPane scrollPane = new JScrollPane();
@@ -188,6 +200,24 @@ public class ConsultaProdutoView extends JDialog {
 		tableColumnModel.getColumn(5).setPreferredWidth(80);
 
 		scrollPane.setViewportView(table);
+		
+		JButton btnImportarCsv = new JButton("Importar CSV");
+		btnImportarCsv.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				importarCsv();
+			}
+		});
+		btnImportarCsv.setBounds(12, 370, 117, 23);
+		getContentPane().add(btnImportarCsv);
+		
+		JButton btnExportarCsv = new JButton("Exportar CSV");
+		btnExportarCsv.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				exportarCsv();
+			}
+		});
+		btnExportarCsv.setBounds(134, 370, 117, 23);
+		getContentPane().add(btnExportarCsv);
 		pesquisar();
 
 		//Coloca a tela no centro da janela.
@@ -324,10 +354,117 @@ public class ConsultaProdutoView extends JDialog {
 			JOptionPane.showMessageDialog(this, "Ocorreu um erro ao executar a operação.", "Erro", JOptionPane.ERROR_MESSAGE);
 		}
 
-	}
+	}	
 
 	private void fecharJanela() {
 		this.setVisible(false);
 		dispose();
 	}
+	
+	public void criarDiretorio() {
+		File file = new File("C:\\Users\\rafae\\Downloads\\Arquivo CSV");
+		file.mkdir();
+	}
+	
+	public void exportarCsv() {
+		JFileChooser fc= new JFileChooser();
+
+		final File arquivoSelecionado = fc.getSelectedFile();
+		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		int resposta = fc.showOpenDialog(null);
+		if (resposta == JFileChooser.APPROVE_OPTION) {
+			 String nomeDiretorio = fc.getSelectedFile().toString();
+			 criar(nomeDiretorio);
+			 }
+		else {
+			System.out.println("Nenhum arquivo selecionado.");
+		}
+	}
+	
+	public void criar(String nomeDiretorio) {
+		File file = new File(nomeDiretorio + "\\Arquivo CSV");
+		int verifica = JOptionPane.showConfirmDialog(null, "Você deseja salvar neste diretório? \n"+file, "ATENÇÃO", JOptionPane.YES_NO_OPTION);
+		if (verifica == JOptionPane.YES_OPTION) {
+			file.mkdir();
+
+			File arquivoTextoDestino = new File(file+"\\Novo Documento de Texto.csv");
+			try {
+
+				OutputStream outputStream = new FileOutputStream(arquivoTextoDestino);
+				OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, "ISO-8859-1");
+
+				PrintWriter printWriter = new PrintWriter(outputStreamWriter, true);
+
+				for (int i = 0; i < 10; i++) {
+					printWriter.println("Linha com o valor " + i);
+					System.out.println("Linha com o valor " + i);
+				}
+
+				outputStream.close();
+				outputStreamWriter.close();
+
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}else {
+			JOptionPane.showMessageDialog(null,"Operação cancelada");
+		}
+		
+	}
+	
+	public void importarCsv() {
+		JFileChooser jFileChooser = new JFileChooser();
+		FileNameExtensionFilter filtro = new FileNameExtensionFilter("Apenas arquivos .csv", "csv");
+		jFileChooser.setAcceptAllFileFilterUsed(false);
+		jFileChooser.addChoosableFileFilter(filtro);
+		int resposta = jFileChooser.showOpenDialog(null);
+		if(resposta == JFileChooser.APPROVE_OPTION) {
+			File arquivoSelecionado = jFileChooser.getSelectedFile();
+			String caminho = arquivoSelecionado.getAbsolutePath();		
+			File arquivoCSV = new File(caminho);
+			
+			try {
+				
+				FileReader fileReader = new FileReader(arquivoCSV);
+				
+				BufferedReader bufferedReader = new BufferedReader(fileReader);
+				
+				String linha = null;
+				int numLinha = 0;
+				
+				while((linha = bufferedReader.readLine()) != null) {
+					numLinha ++;
+					
+					if(numLinha != 1) {
+						//System.out.println(linha);
+						
+						String vetor[] = linha.split(";");
+						System.out.println("Nome:" + vetor[1].replaceAll("\\s+", " "));
+						System.out.println("Código barras:" + vetor[2]);
+						
+					}
+					
+				}
+				
+				fileReader.close();
+				bufferedReader.close();
+				
+				
+			} catch (FileNotFoundException e) {			
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+		}else {		
+			System.out.println("Nenhum arquivo selecionado.");
+		}
+	}
 }
+

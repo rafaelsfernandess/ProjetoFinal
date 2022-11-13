@@ -5,6 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
 import br.com.empresa.exception.BOException;
 import br.com.empresa.exception.BOValidationException;
 import br.com.empresa.vo.ClienteVO;
@@ -36,10 +43,43 @@ public class ProdutoDAO implements IProdutoDAO {
 
 		// TODO implementar de forma correta posteriormente.
 
-		List<ProdutoVO> produtoVOs = Dados.getProdutoVOs();
+		//List<ProdutoVO> produtoVOs = Dados.getProdutoVOs();
+		
+		EntityManager em = HibernateUtil.getEntityManager();
+		
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<ProdutoVO> criteria = cb.createQuery(ProdutoVO.class);
+		
+		//Cláusula From
+		Root<ProdutoVO> produtoFrom = criteria.from(ProdutoVO.class);
+		
+		//Cláusula Where
+		/*ClienteVO c1 = new ClienteVO();
+		c1.setId(new BigInteger("1"));*/
+		Predicate produtoWhere = cb.equal(produtoFrom.get("client"), client);
+		
+		//Cláusula orderBy
+		//Order produtoOrderBy = cb.asc(produtoFrom.get("descri"));
+		
+		//Atribuindo as cláusulas à consulta
+		criteria.select(produtoFrom);
+		criteria.where(produtoWhere);
+		//criteria.orderBy(produtoOrderBy);
+		
+		TypedQuery<ProdutoVO> query = em.createQuery(criteria);
+				
+		List<ProdutoVO> listaProdutos = query.getResultList();
+		
+		/*for (ProdutoVO produtoVO : listaProdutos) {
+			System.out.println("Produto: " + produtoVO.getId() + " - " 
+					+ produtoVO.getDescri() + " - " + produtoVO.getClient().getDescri());
+		}*/
+		
+		
+		
 		List<ProdutoVO> retorno = new ArrayList<>();
 
-		for (ProdutoVO produto : produtoVOs) {
+		for (ProdutoVO produto : listaProdutos) {
 
 			if (produto.getClient().equals(client) == false) {
 				continue;
@@ -71,6 +111,8 @@ public class ProdutoDAO implements IProdutoDAO {
 
 			retorno.add(produto);
 		}
+		
+		em.close();
 
 		return retorno;
 	}

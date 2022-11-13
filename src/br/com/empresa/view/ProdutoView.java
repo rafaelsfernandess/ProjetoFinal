@@ -41,6 +41,7 @@ public class ProdutoView extends JDialog {
 
 	private IServicoBeanLocal servicoBeanLocal;
 	private ConsultaProdutoView consultaProdutoView;
+	private JTextField tfLucro;
 
 	/**
 	 * Create the dialog.
@@ -63,7 +64,7 @@ public class ProdutoView extends JDialog {
 
 		produtoVO = new ProdutoVO();
 
-		setBounds(100, 100, 466, 300);
+		setBounds(100, 100, 466, 446);
 
 		//Coloca a tela no centro da janela.
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -117,7 +118,7 @@ public class ProdutoView extends JDialog {
 		getContentPane().add(ftfVlrCompra);
 
 		JLabel lblVlrVenda = new JLabel("Vlr. Venda: *");
-		lblVlrVenda.setBounds(12, 159, 109, 15);
+		lblVlrVenda.setBounds(12, 160, 109, 15);
 		getContentPane().add(lblVlrVenda);
 
 		ftfVlrVenda = new JFormattedTextField();
@@ -126,12 +127,12 @@ public class ProdutoView extends JDialog {
 		getContentPane().add(ftfVlrVenda);
 
 		JLabel lbStatus = new JLabel("Status: *");
-		lbStatus.setBounds(12, 191, 109, 15);
+		lbStatus.setBounds(12, 281, 109, 15);
 		getContentPane().add(lbStatus);
 
 		cbStatus = new JComboBox();
 		cbStatus.setModel(new DefaultComboBoxModel(StatusEnum.values()));
-		cbStatus.setBounds(128, 186, 114, 24);
+		cbStatus.setBounds(128, 276, 114, 24);
 		getContentPane().add(cbStatus);
 
 		JButton btnSalvar = new JButton("Salvar");
@@ -140,7 +141,7 @@ public class ProdutoView extends JDialog {
 				salvar();
 			}
 		});
-		btnSalvar.setBounds(208, 234, 117, 25);
+		btnSalvar.setBounds(208, 371, 117, 25);
 		getContentPane().add(btnSalvar);
 
 		JButton btnFechar = new JButton("Fechar");
@@ -149,8 +150,34 @@ public class ProdutoView extends JDialog {
 				fechar();
 			}
 		});
-		btnFechar.setBounds(337, 234, 117, 25);
+		btnFechar.setBounds(333, 371, 117, 25);
 		getContentPane().add(btnFechar);
+		
+		JLabel lblLucro = new JLabel("Lucro: *");
+		lblLucro.setBounds(12, 191, 46, 14);
+		getContentPane().add(lblLucro);
+		
+		JLabel lblFabricacao = new JLabel("Data Fabricação: *");
+		lblFabricacao.setBounds(12, 222, 98, 14);
+		getContentPane().add(lblFabricacao);
+		
+		JLabel lblValidade = new JLabel("Data Validade: *");
+		lblValidade.setBounds(12, 250, 84, 14);
+		getContentPane().add(lblValidade);
+		
+		JFormattedTextField ftfFabricacao = new JFormattedTextField();
+		ftfFabricacao.setBounds(128, 219, 98, 20);
+		getContentPane().add(ftfFabricacao);
+		
+		JFormattedTextField ftfValidade = new JFormattedTextField();
+		ftfValidade.setBounds(128, 247, 98, 20);
+		getContentPane().add(ftfValidade);
+		
+		tfLucro = new JTextField();
+		tfLucro.setEnabled(false);
+		tfLucro.setBounds(128, 187, 86, 20);
+		getContentPane().add(tfLucro);
+		tfLucro.setColumns(10);
 	}
 
 	private void salvar() {
@@ -231,5 +258,4 @@ public class ProdutoView extends JDialog {
 		setVisible(false);
 		dispose();
 	}
-
 }
