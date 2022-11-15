@@ -6,11 +6,14 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+
+import org.hibernate.sql.Delete;
 
 import br.com.empresa.exception.BOException;
 import br.com.empresa.exception.BOValidationException;
@@ -25,58 +28,37 @@ public class ProdutoDAO implements IProdutoDAO {
 
 	@Override
 	public ProdutoVO buscarProdutoPorId(ProdutoVO produtoVO) throws BOException {
+		//PROCURA POR ID ---PRONTO---
+		EntityManager em = HibernateUtil.getEntityManager();
+		
+		ProdutoVO produto = em.find(ProdutoVO.class, produtoVO.getId());
 
-		List<ProdutoVO> produtoVOs = Dados.getProdutoVOs();
-
-		for (ProdutoVO p : produtoVOs) {
-
-			if (produtoVO.equals(p)) {
-				return p;
-			}
-		}
-
-		return null;
+		em.close();
+		
+		return produto;
 	}
 
 	@Override
 	public List<ProdutoVO> listarProduto(BigInteger id, String descri, String status, String codbar, ClienteVO client) throws BOException {
-
-		// TODO implementar de forma correta posteriormente.
-
-		//List<ProdutoVO> produtoVOs = Dados.getProdutoVOs();
-		
+		//LISTA DE PRODUTOS NA TABELA PRODUTO ---PRONTO---
 		EntityManager em = HibernateUtil.getEntityManager();
-		
 		CriteriaBuilder cb = em.getCriteriaBuilder();
+		
 		CriteriaQuery<ProdutoVO> criteria = cb.createQuery(ProdutoVO.class);
 		
 		//Cláusula From
 		Root<ProdutoVO> produtoFrom = criteria.from(ProdutoVO.class);
 		
 		//Cláusula Where
-		/*ClienteVO c1 = new ClienteVO();
-		c1.setId(new BigInteger("1"));*/
 		Predicate produtoWhere = cb.equal(produtoFrom.get("client"), client);
 		
-		//Cláusula orderBy
-		//Order produtoOrderBy = cb.asc(produtoFrom.get("descri"));
-		
-		//Atribuindo as cláusulas à consulta
 		criteria.select(produtoFrom);
 		criteria.where(produtoWhere);
-		//criteria.orderBy(produtoOrderBy);
 		
 		TypedQuery<ProdutoVO> query = em.createQuery(criteria);
 				
 		List<ProdutoVO> listaProdutos = query.getResultList();
-		
-		/*for (ProdutoVO produtoVO : listaProdutos) {
-			System.out.println("Produto: " + produtoVO.getId() + " - " 
-					+ produtoVO.getDescri() + " - " + produtoVO.getClient().getDescri());
-		}*/
-		
-		
-		
+				
 		List<ProdutoVO> retorno = new ArrayList<>();
 
 		for (ProdutoVO produto : listaProdutos) {
@@ -155,36 +137,51 @@ public class ProdutoDAO implements IProdutoDAO {
 		return 0;
 	}
 
+
 	@Override
 	public void salvarProduto(ProdutoVO produtoVO) throws BOValidationException, BOException {
-
-		List<ProdutoVO> produtoVOs = Dados.getProdutoVOs();
-
-		if (produtoVO.getId() == null) {
-			if (produtoVOs.size() > 0) {
-				ProdutoVO ultimoProduto = produtoVOs.get(produtoVOs.size() - 1);
-				produtoVO.setId(ultimoProduto.getId().add(BigInteger.ONE));
-			} else {
-				produtoVO.setId(BigInteger.ONE);
-			}
-
-			Dados.getProdutoVOs().add(produtoVO);
-		} else {
-			for (int i = 0; i < produtoVOs.size(); i++) {
-				if (produtoVOs.get(i).equals(produtoVO)) {
-					Dados.getProdutoVOs().set(i, produtoVO);
-				}
-			}
+		//SALVAR PRODUTO ---PRONTO---
+		EntityManager em = HibernateUtil.getEntityManager();
+		
+		ClienteVO c = new ClienteVO();
+		c.setId(BigInteger.ONE);
+		
+		produtoVO.setDescri(produtoVO.getDescri());
+		produtoVO.setCodbar(produtoVO.getCodbar());
+		produtoVO.setQtdest(produtoVO.getQtdest());
+		produtoVO.setValcom(produtoVO.getValcom());
+		produtoVO.setValven(produtoVO.getValven());
+		produtoVO.setStatus(produtoVO.getStatus());
+		produtoVO.setClient(c);
+		
+		try {
+			em.getTransaction().begin();
+			em.persist(produtoVO);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			em.getTransaction().rollback();
 		}
+				
 	}
 
 	@Override
 	public void excluirProduto(ProdutoVO produtoVO) throws BOValidationException, BOException {
-
-		for (int i = 0; i < Dados.getProdutoVOs().size(); i++) {
-			if (Dados.getProdutoVOs().get(i).equals(produtoVO)) {
-				Dados.getProdutoVOs().remove(i);
-			}
+	// DELETAR PRODUTO ---PRONTO---
+	EntityManager em = HibernateUtil.getEntityManager();
+		
+		ClienteVO c = new ClienteVO();
+		c.setId(BigInteger.ONE);
+				
+		try {
+			
+			em.getTransaction().begin();
+			Query q = em.createNativeQuery("delete from esprodut where id ="+produtoVO.getId());
+			q.executeUpdate();
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			em.getTransaction().rollback();
 		}
 
 	}
