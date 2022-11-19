@@ -186,6 +186,8 @@ public class ConsultaProdutoView extends JDialog {
 		tableModel.addColumn("Status");
 		tableModel.addColumn("Vlr. compra");
 		tableModel.addColumn("Vlr. venda");
+		tableModel.addColumn("Data Fab.");
+		tableModel.addColumn("Data Val.");
 
 		table = new JTable(tableModel);
 		table.setAutoscrolls(true);
@@ -198,6 +200,8 @@ public class ConsultaProdutoView extends JDialog {
 		tableColumnModel.getColumn(3).setPreferredWidth(100);
 		tableColumnModel.getColumn(4).setPreferredWidth(80);
 		tableColumnModel.getColumn(5).setPreferredWidth(80);
+		tableColumnModel.getColumn(6).setPreferredWidth(80);
+		tableColumnModel.getColumn(7).setPreferredWidth(80);
 
 		scrollPane.setViewportView(table);
 		
@@ -343,6 +347,12 @@ public class ConsultaProdutoView extends JDialog {
 					if (p.getValven() != null) {
 						rowData.getValues().put(5, decimalFormat.format(p.getValven()));
 					}
+					/*if (p.getDatfab() != null) {
+						rowData.getValues().put(1, p.getDatfab());
+					}
+					if (p.getDatval() != null) {
+						rowData.getValues().put(1, p.getValven());
+					}*/
 					rowData.setElement(p);
 					tableModel.addRow(rowData);
 				}
@@ -354,7 +364,7 @@ public class ConsultaProdutoView extends JDialog {
 			JOptionPane.showMessageDialog(this, "Ocorreu um erro ao executar a operação.", "Erro", JOptionPane.ERROR_MESSAGE);
 		}
 
-	}	
+	}
 
 	private void fecharJanela() {
 		this.setVisible(false);

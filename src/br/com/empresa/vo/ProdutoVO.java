@@ -3,6 +3,7 @@ package br.com.empresa.vo;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Date;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -15,6 +16,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -77,6 +80,18 @@ public class ProdutoVO implements Serializable {
 		nullable = false)
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	private ClienteVO client;
+	
+	//Data fabricação
+	@Basic(optional = true)
+	@Column(name = "datfab", nullable = true)
+	@Temporal(TemporalType.DATE)
+	private Date datfab;
+	
+	//Data validade
+	@Basic(optional = true)
+	@Column(name = "datval", nullable = true)
+	@Temporal(TemporalType.DATE)
+	private Date datval;
 	
 	public ProdutoVO() {
 	}
@@ -149,6 +164,22 @@ public class ProdutoVO implements Serializable {
 
 	public void setCodbar(String codbar) {
 		this.codbar = codbar;
+	}
+
+	public Date getDatfab() {
+		return datfab;
+	}
+
+	public void setDatfab(Date datfab) {
+		this.datfab = datfab;
+	}
+
+	public Date getDatval() {
+		return datval;
+	}
+
+	public void setDatval(Date datval) {
+		this.datval = datval;
 	}
 
 	public static long getSerialversionuid() {

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -28,37 +27,38 @@ public class ProdutoDAO implements IProdutoDAO {
 
 	@Override
 	public ProdutoVO buscarProdutoPorId(ProdutoVO produtoVO) throws BOException {
-		//PROCURA POR ID ---PRONTO---
+		// PROCURA POR ID ---PRONTO---
 		EntityManager em = HibernateUtil.getEntityManager();
-		
+
 		ProdutoVO produto = em.find(ProdutoVO.class, produtoVO.getId());
 
 		em.close();
-		
+
 		return produto;
 	}
 
 	@Override
-	public List<ProdutoVO> listarProduto(BigInteger id, String descri, String status, String codbar, ClienteVO client) throws BOException {
-		//LISTA DE PRODUTOS NA TABELA PRODUTO ---PRONTO---
+	public List<ProdutoVO> listarProduto(BigInteger id, String descri, String status, String codbar, ClienteVO client)
+			throws BOException {
+		// LISTA DE PRODUTOS NA TABELA PRODUTO ---PRONTO---
 		EntityManager em = HibernateUtil.getEntityManager();
 		CriteriaBuilder cb = em.getCriteriaBuilder();
-		
+
 		CriteriaQuery<ProdutoVO> criteria = cb.createQuery(ProdutoVO.class);
-		
-		//Cláusula From
+
+		// Cláusula From
 		Root<ProdutoVO> produtoFrom = criteria.from(ProdutoVO.class);
-		
-		//Cláusula Where
+
+		// Cláusula Where
 		Predicate produtoWhere = cb.equal(produtoFrom.get("client"), client);
-		
+
 		criteria.select(produtoFrom);
 		criteria.where(produtoWhere);
-		
+
 		TypedQuery<ProdutoVO> query = em.createQuery(criteria);
-				
+
 		List<ProdutoVO> listaProdutos = query.getResultList();
-				
+
 		List<ProdutoVO> retorno = new ArrayList<>();
 
 		for (ProdutoVO produto : listaProdutos) {
@@ -68,39 +68,40 @@ public class ProdutoDAO implements IProdutoDAO {
 			}
 
 			if (id != null) {
-				if(produto.getId().equals(id) == false) {
+				if (produto.getId().equals(id) == false) {
 					continue;
 				}
 			}
-			
-			if(descri != null && descri.trim().length() > 0) {
-				if(produto.getDescri().contains(descri) == false) {
+
+			if (descri != null && descri.trim().length() > 0) {
+				if (produto.getDescri().contains(descri) == false) {
 					continue;
 				}
 			}
-			
-			if(status != null) {
-				if(produto.getStatus().equals(status) == false) {
+
+			if (status != null) {
+				if (produto.getStatus().equals(status) == false) {
 					continue;
 				}
 			}
-			
-			if(codbar != null && codbar.trim().length() > 0) {
-				if(produto.getCodbar().contains(codbar) == false) {
+
+			if (codbar != null && codbar.trim().length() > 0) {
+				if (produto.getCodbar().contains(codbar) == false) {
 					continue;
 				}
 			}
 
 			retorno.add(produto);
 		}
-		
+
 		em.close();
 
 		return retorno;
 	}
 
 	@Override
-	public int listarProdutoCount(BigInteger id, String descri, String status, String codbar, ClienteVO client) throws BOException {
+	public int listarProdutoCount(BigInteger id, String descri, String status, String codbar, ClienteVO client)
+			throws BOException {
 
 		// TODO implementar de forma correta posteriormente.
 
@@ -114,7 +115,8 @@ public class ProdutoDAO implements IProdutoDAO {
 	}
 
 	@Override
-	public List<ProdutoVO> listarProduto(int first, int pageSize, Map<String, Object> filters, ClienteVO cliente) throws BOException {
+	public List<ProdutoVO> listarProduto(int first, int pageSize, Map<String, Object> filters, ClienteVO cliente)
+			throws BOException {
 
 		// TODO implementar de forma correta posteriormente.
 
@@ -137,51 +139,74 @@ public class ProdutoDAO implements IProdutoDAO {
 		return 0;
 	}
 
-
 	@Override
 	public void salvarProduto(ProdutoVO produtoVO) throws BOValidationException, BOException {
-		//SALVAR PRODUTO ---PRONTO---
+		// SALVAR PRODUTO ---PRONTO---
 		EntityManager em = HibernateUtil.getEntityManager();
-		
+
 		ClienteVO c = new ClienteVO();
 		c.setId(BigInteger.ONE);
-		
-		produtoVO.setDescri(produtoVO.getDescri());
-		produtoVO.setCodbar(produtoVO.getCodbar());
-		produtoVO.setQtdest(produtoVO.getQtdest());
-		produtoVO.setValcom(produtoVO.getValcom());
-		produtoVO.setValven(produtoVO.getValven());
-		produtoVO.setStatus(produtoVO.getStatus());
-		produtoVO.setClient(c);
-		
-		try {
-			em.getTransaction().begin();
-			em.persist(produtoVO);
-			em.getTransaction().commit();
-		} catch (Exception e) {
-			e.printStackTrace();
-			em.getTransaction().rollback();
+
+		if (produtoVO.getId() == null) {
+			produtoVO.setDescri(produtoVO.getDescri());
+			produtoVO.setCodbar(produtoVO.getCodbar());
+			produtoVO.setQtdest(produtoVO.getQtdest());
+			produtoVO.setValcom(produtoVO.getValcom());
+			produtoVO.setValven(produtoVO.getValven());
+			produtoVO.setStatus(produtoVO.getStatus());
+			produtoVO.setDatfab(produtoVO.getDatfab());
+			produtoVO.setDatval(produtoVO.getDatval());
+			produtoVO.setClient(c);
+
+			try {
+				em.getTransaction().begin();
+				em.persist(produtoVO);
+				em.getTransaction().commit();
+			} catch (Exception e) {
+				e.printStackTrace();
+				em.getTransaction().rollback();
+			}
+		} else {
+			
+			try {
+				em.getTransaction().begin();
+				ProdutoVO produto = em.find(ProdutoVO.class, produtoVO.getId());
+				produtoVO.setDescri(produtoVO.getDescri());
+				produtoVO.setCodbar(produtoVO.getCodbar());
+				produtoVO.setQtdest(produtoVO.getQtdest());
+				produtoVO.setValcom(produtoVO.getValcom());
+				produtoVO.setValven(produtoVO.getValven());
+				produtoVO.setStatus(produtoVO.getStatus());
+				produtoVO.setDatfab(produtoVO.getDatfab());
+				produtoVO.setDatval(produtoVO.getDatval());
+				produtoVO.setClient(c);
+				em.merge(produtoVO);
+				em.getTransaction().commit();
+			} catch (Exception e) {
+				e.printStackTrace();
+				em.getTransaction().rollback();
+			}finally {
+				em.close();
+			}
 		}
-				
+
 	}
 
 	@Override
 	public void excluirProduto(ProdutoVO produtoVO) throws BOValidationException, BOException {
-	// DELETAR PRODUTO ---PRONTO---
-	EntityManager em = HibernateUtil.getEntityManager();
-		
-		ClienteVO c = new ClienteVO();
-		c.setId(BigInteger.ONE);
-				
+		// DELETAR PRODUTO ---PRONTO---
+		EntityManager em = HibernateUtil.getEntityManager();
+
 		try {
-			
 			em.getTransaction().begin();
-			Query q = em.createNativeQuery("delete from esprodut where id ="+produtoVO.getId());
-			q.executeUpdate();
+			ProdutoVO produto = em.find(ProdutoVO.class, produtoVO.getId());
+			em.remove(produto);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			e.printStackTrace();
 			em.getTransaction().rollback();
+		} finally {
+			em.close();
 		}
 
 	}

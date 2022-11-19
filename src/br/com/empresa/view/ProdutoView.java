@@ -6,7 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.DecimalFormat;
+import java.util.Date;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -25,7 +25,6 @@ import br.com.empresa.service.ServicoBeanLocal;
 import br.com.empresa.view.util.MascaraJFormattedTextField;
 import br.com.empresa.vo.ProdutoVO;
 import br.com.empresa.vo.enums.StatusEnum;
-import br.com.empresa.vo.enums.TipoPessoaEnum;
 
 public class ProdutoView extends JDialog {
 
@@ -36,7 +35,8 @@ public class ProdutoView extends JDialog {
 	private JFormattedTextField ftfQtd;
 	private JFormattedTextField ftfVlrCompra;
 	private JFormattedTextField ftfVlrVenda;
-
+	private JFormattedTextField ftfValidade;
+	private JFormattedTextField ftfFabricacao;
 	private ProdutoVO produtoVO;
 
 	private IServicoBeanLocal servicoBeanLocal;
@@ -129,6 +129,32 @@ public class ProdutoView extends JDialog {
 		JLabel lbStatus = new JLabel("Status: *");
 		lbStatus.setBounds(12, 281, 109, 15);
 		getContentPane().add(lbStatus);
+		
+		JLabel lblFabricacao = new JLabel("Data Fabricação: *");
+		lblFabricacao.setBounds(12, 222, 98, 14);
+		getContentPane().add(lblFabricacao);
+		
+		ftfFabricacao = new JFormattedTextField();
+		ftfFabricacao.setBounds(128, 219, 98, 20);
+		getContentPane().add(ftfFabricacao);
+		
+		JLabel lblValidade = new JLabel("Data Validade: *");
+		lblValidade.setBounds(12, 250, 84, 14);
+		getContentPane().add(lblValidade);
+		
+		ftfValidade = new JFormattedTextField();
+		ftfValidade.setBounds(128, 247, 98, 20);
+		getContentPane().add(ftfValidade);
+		
+		JLabel lblLucro = new JLabel("Lucro: *");
+		lblLucro.setBounds(12, 191, 46, 14);
+		getContentPane().add(lblLucro);
+		
+		tfLucro = new JTextField();
+		tfLucro.setEnabled(false);
+		tfLucro.setBounds(128, 187, 86, 20);
+		getContentPane().add(tfLucro);
+		tfLucro.setColumns(10);
 
 		cbStatus = new JComboBox();
 		cbStatus.setModel(new DefaultComboBoxModel(StatusEnum.values()));
@@ -153,31 +179,7 @@ public class ProdutoView extends JDialog {
 		btnFechar.setBounds(333, 371, 117, 25);
 		getContentPane().add(btnFechar);
 		
-		JLabel lblLucro = new JLabel("Lucro: *");
-		lblLucro.setBounds(12, 191, 46, 14);
-		getContentPane().add(lblLucro);
 		
-		JLabel lblFabricacao = new JLabel("Data Fabricação: *");
-		lblFabricacao.setBounds(12, 222, 98, 14);
-		getContentPane().add(lblFabricacao);
-		
-		JLabel lblValidade = new JLabel("Data Validade: *");
-		lblValidade.setBounds(12, 250, 84, 14);
-		getContentPane().add(lblValidade);
-		
-		JFormattedTextField ftfFabricacao = new JFormattedTextField();
-		ftfFabricacao.setBounds(128, 219, 98, 20);
-		getContentPane().add(ftfFabricacao);
-		
-		JFormattedTextField ftfValidade = new JFormattedTextField();
-		ftfValidade.setBounds(128, 247, 98, 20);
-		getContentPane().add(ftfValidade);
-		
-		tfLucro = new JTextField();
-		tfLucro.setEnabled(false);
-		tfLucro.setBounds(128, 187, 86, 20);
-		getContentPane().add(tfLucro);
-		tfLucro.setColumns(10);
 	}
 
 	private void salvar() {
@@ -221,6 +223,16 @@ public class ProdutoView extends JDialog {
 			StatusEnum status = (StatusEnum)cbStatus.getSelectedItem();
 			if(status != null) {
 				produtoVO.setStatus(status.name());
+			}
+			
+			Date ftfFabricacao = new Date();
+			if(status != null) {
+				produtoVO.setDatfab(ftfFabricacao);
+			}
+			
+			Date ftfValidade = new Date();
+			if(status != null) {
+				produtoVO.setDatval(ftfValidade);
 			}
 			
 			produtoVO.setClient(Dados.getClienteSelecionado());
