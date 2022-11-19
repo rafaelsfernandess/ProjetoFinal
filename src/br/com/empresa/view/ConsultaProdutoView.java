@@ -16,10 +16,18 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -38,6 +46,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableColumnModel;
 
 import br.com.empresa.dao.Dados;
+import br.com.empresa.dao.HibernateUtil;
 import br.com.empresa.exception.BOException;
 import br.com.empresa.exception.BOValidationException;
 import br.com.empresa.service.IServicoBeanLocal;
@@ -319,6 +328,12 @@ public class ConsultaProdutoView extends JDialog {
 				codbar = this.tfCodBarra.getText();
 				filters.put("codbar", codbar);
 			}
+			
+			Date datfab = null; // DATE
+			if (this.ftfCodigo.getText() != null && this.ftfCodigo.getText().trim().length() > 0) {
+				id = new BigInteger(ftfCodigo.getText().trim());
+				filters.put("id", id);
+			}
 
 			List<ProdutoVO> produtoVOs = servicoBeanLocal.listarProduto(id, descri, status, codbar, Dados.getClienteSelecionado());
 
@@ -405,13 +420,39 @@ public class ConsultaProdutoView extends JDialog {
 
 				PrintWriter printWriter = new PrintWriter(outputStreamWriter, true);
 
-				for (int i = 0; i < 10; i++) {
-					printWriter.println("Linha com o valor " + i);
-					System.out.println("Linha com o valor " + i);
+				EntityManager em = HibernateUtil.getEntityManager();
+				
+				CriteriaBuilder cb = em.getCriteriaBuilder();
+				CriteriaQuery<ProdutoVO> criteria = cb.createQuery(ProdutoVO.class);
+				
+				//Clausula from
+				Root<ProdutoVO> produtoFrom = criteria.from(ProdutoVO.class);
+				
+				//Clausula where
+				Predicate produtoWhere = cb.equal(produtoFrom.get("client"), new BigInteger("1"));
+				
+				//Clausula order by
+				Order produtoOrderBy = cb.asc(produtoFrom.get("descri"));
+				
+				//Atribuindo as clausulas a consulta
+				criteria.select(produtoFrom);
+				criteria.where(produtoWhere);
+				criteria.orderBy(produtoOrderBy);
+				
+				TypedQuery<ProdutoVO> query = em.createQuery(criteria);
+				List<ProdutoVO> listaProdutos = query.getResultList();
+
+				printWriter.println("ID;DESCRI;CODIGO DE BARRA");
+				for (ProdutoVO produtoVO : listaProdutos) {
+					printWriter.println(produtoVO.getId() + ";" + produtoVO.getDescri() + ";" + 
+						     produtoVO.getCodbar());
+					System.out.println(produtoVO.getId() + ";" + produtoVO.getDescri() + ";" + 
+						     produtoVO.getCodbar());
 				}
 
 				outputStream.close();
 				outputStreamWriter.close();
+				em.close();
 
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
