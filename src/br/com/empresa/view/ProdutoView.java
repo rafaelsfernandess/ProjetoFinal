@@ -33,15 +33,15 @@ public class ProdutoView extends JDialog {
 	private JComboBox cbStatus;
 	private JFormattedTextField ftfCodBar;
 	private JFormattedTextField ftfQtd;
-	private JFormattedTextField ftfVlrCompra;
-	private JFormattedTextField ftfVlrVenda;
-	private JFormattedTextField ftfValidade;
-	private JFormattedTextField ftfFabricacao;
 	private ProdutoVO produtoVO;
 
 	private IServicoBeanLocal servicoBeanLocal;
 	private ConsultaProdutoView consultaProdutoView;
 	private JTextField tfLucro;
+	private JTextField tfVlrCompra;
+	private JTextField tfVlrVenda;
+	private JTextField tfDtFabricacao;
+	private JTextField tfDtValidade;
 
 	/**
 	 * Create the dialog.
@@ -112,19 +112,9 @@ public class ProdutoView extends JDialog {
 		lblVlrCompra.setBounds(12, 130, 109, 15);
 		getContentPane().add(lblVlrCompra);
 
-		ftfVlrCompra = new JFormattedTextField();
-		MascaraJFormattedTextField.formatNumericField(ftfVlrCompra);
-		ftfVlrCompra.setBounds(128, 128, 114, 19);
-		getContentPane().add(ftfVlrCompra);
-
 		JLabel lblVlrVenda = new JLabel("Vlr. Venda: *");
 		lblVlrVenda.setBounds(12, 160, 109, 15);
 		getContentPane().add(lblVlrVenda);
-
-		ftfVlrVenda = new JFormattedTextField();
-		MascaraJFormattedTextField.formatNumericField(ftfVlrVenda);
-		ftfVlrVenda.setBounds(128, 157, 114, 19);
-		getContentPane().add(ftfVlrVenda);
 
 		JLabel lbStatus = new JLabel("Status: *");
 		lbStatus.setBounds(12, 281, 109, 15);
@@ -134,17 +124,9 @@ public class ProdutoView extends JDialog {
 		lblFabricacao.setBounds(12, 222, 98, 14);
 		getContentPane().add(lblFabricacao);
 		
-		ftfFabricacao = new JFormattedTextField();
-		ftfFabricacao.setBounds(128, 219, 98, 20);
-		getContentPane().add(ftfFabricacao);
-		
 		JLabel lblValidade = new JLabel("Data Validade: *");
 		lblValidade.setBounds(12, 250, 84, 14);
 		getContentPane().add(lblValidade);
-		
-		ftfValidade = new JFormattedTextField();
-		ftfValidade.setBounds(128, 247, 98, 20);
-		getContentPane().add(ftfValidade);
 		
 		JLabel lblLucro = new JLabel("Lucro: *");
 		lblLucro.setBounds(12, 191, 46, 14);
@@ -160,6 +142,26 @@ public class ProdutoView extends JDialog {
 		cbStatus.setModel(new DefaultComboBoxModel(StatusEnum.values()));
 		cbStatus.setBounds(128, 276, 114, 24);
 		getContentPane().add(cbStatus);
+		
+		tfVlrCompra = new JTextField();
+		tfVlrCompra.setBounds(128, 129, 86, 20);
+		getContentPane().add(tfVlrCompra);
+		tfVlrCompra.setColumns(10);
+		
+		tfVlrVenda = new JTextField();
+		tfVlrVenda.setBounds(128, 157, 86, 20);
+		getContentPane().add(tfVlrVenda);
+		tfVlrVenda.setColumns(10);
+		
+		tfDtFabricacao = new JTextField();
+		tfDtFabricacao.setBounds(126, 219, 86, 20);
+		getContentPane().add(tfDtFabricacao);
+		tfDtFabricacao.setColumns(10);
+		
+		tfDtValidade = new JTextField();
+		tfDtValidade.setBounds(126, 247, 86, 20);
+		getContentPane().add(tfDtValidade);
+		tfDtValidade.setColumns(10);
 
 		JButton btnSalvar = new JButton("Salvar");
 		btnSalvar.addActionListener(new ActionListener() {
@@ -194,14 +196,14 @@ public class ProdutoView extends JDialog {
 			String descri = tfDescricao.getText();
 			produtoVO.setDescri(descri);
 
-			String vlrcom = ftfVlrCompra.getText().trim();
+			String vlrcom = tfVlrCompra.getText().trim();
 			vlrcom = vlrcom.replaceAll("\\.", "").replaceAll(",", ".");
 			if(vlrcom.length() > 1) {
 				BigDecimal vlrCompra = new BigDecimal(vlrcom);
 				produtoVO.setValcom(vlrCompra);
 			}
 			
-			String vlrven = ftfVlrVenda.getText().trim();
+			String vlrven = tfVlrVenda.getText().trim();
 			vlrven = vlrven.replaceAll("\\.", "").replaceAll(",", ".");
 			if(vlrven.length() > 1) {
 				BigDecimal vlrVenda = new BigDecimal(vlrven);
@@ -260,8 +262,8 @@ public class ProdutoView extends JDialog {
 		this.tfcodigo.setText(produtoVO.getId().toString());
 		this.tfDescricao.setText(produtoVO.getDescri());
 		this.ftfCodBar.setText(produtoVO.getCodbar());
-		this.ftfVlrCompra.setText(produtoVO.getValcom().toPlainString());
-		this.ftfVlrVenda.setText(produtoVO.getValven().toPlainString());
+		this.tfVlrCompra.setText(produtoVO.getValcom().toPlainString());
+		this.tfVlrVenda.setText(produtoVO.getValven().toPlainString());
 		this.ftfQtd.setText(produtoVO.getQtdest().toPlainString());
 
 	}
