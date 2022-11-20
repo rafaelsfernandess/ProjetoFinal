@@ -1,6 +1,7 @@
 package br.com.empresa.service;
 
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -116,7 +117,7 @@ public interface IServicoBeanLocal {
 	 * @return
 	 * @throws BOException
 	 */
-	public abstract List<ProdutoVO> listarProduto(BigInteger id, String descri, String status, String codbar, ClienteVO client) throws BOException;
+	public abstract List<ProdutoVO> listarProduto(BigInteger id, String descri, String status, String codbar,  ClienteVO client) throws BOException;
 
 	/**
 	 * 

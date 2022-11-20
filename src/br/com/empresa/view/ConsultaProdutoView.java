@@ -70,6 +70,7 @@ public class ConsultaProdutoView extends JDialog {
 	private JFormattedTextField ftfCodigo;
 
 	private IServicoBeanLocal servicoBeanLocal;
+	private Object tfDtFabricacao;
 
 	/**
 	 * Create the dialog.
@@ -330,14 +331,9 @@ public class ConsultaProdutoView extends JDialog {
 				codbar = this.tfCodBarra.getText();
 				filters.put("codbar", codbar);
 			}
-			
-			Date datfab = null; // DATE
-			if (this.ftfCodigo.getText() != null && this.ftfCodigo.getText().trim().length() > 0) {
-				id = new BigInteger(ftfCodigo.getText().trim());
-				filters.put("id", id);
-			}
 
-			List<ProdutoVO> produtoVOs = servicoBeanLocal.listarProduto(id, descri, status, codbar, Dados.getClienteSelecionado());
+
+			List<ProdutoVO> produtoVOs = servicoBeanLocal.listarProduto(id, descri, status, codbar,  Dados.getClienteSelecionado());
 
 			if (produtoVOs != null) {
 				DecimalFormat decimalFormat = new DecimalFormat("#,###.00");
@@ -364,12 +360,12 @@ public class ConsultaProdutoView extends JDialog {
 					if (p.getValven() != null) {
 						rowData.getValues().put(5, decimalFormat.format(p.getValven()));
 					}
-					/*if (p.getDatfab() != null) {
-						rowData.getValues().put(1, p.getDatfab());
+					if (p.getDatfab() != null) {
+						rowData.getValues().put(6, p.getDatfab());
 					}
 					if (p.getDatval() != null) {
-						rowData.getValues().put(1, p.getValven());
-					}*/
+						rowData.getValues().put(7, p.getDatval());
+					}
 					rowData.setElement(p);
 					tableModel.addRow(rowData);
 				}

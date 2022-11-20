@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.DefaultComboBoxModel;
@@ -227,14 +229,30 @@ public class ProdutoView extends JDialog {
 				produtoVO.setStatus(status.name());
 			}
 			
-			Date ftfFabricacao = new Date();
-			if(status != null) {
-				produtoVO.setDatfab(ftfFabricacao);
+			String datfab = tfDtFabricacao.getText().trim();
+			if(datfab != null) {
+				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+				try {
+					Date date = formatter.parse(datfab);
+					produtoVO.setDatfab(date); 
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 			}
 			
-			Date ftfValidade = new Date();
-			if(status != null) {
-				produtoVO.setDatval(ftfValidade);
+			String datval = tfDtValidade.getText().trim();
+			if(datval != null) {
+				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+				try {
+					Date date2 = formatter.parse(datval);	
+					produtoVO.setDatval(date2);
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 			}
 			
 			produtoVO.setClient(Dados.getClienteSelecionado());
