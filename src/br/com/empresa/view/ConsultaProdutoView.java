@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.Date;
@@ -54,6 +55,7 @@ import br.com.empresa.service.ServicoBeanLocal;
 import br.com.empresa.view.util.MascaraJFormattedTextField;
 import br.com.empresa.view.util.RowData;
 import br.com.empresa.view.util.TableModel;
+import br.com.empresa.vo.ClienteVO;
 import br.com.empresa.vo.ProdutoVO;
 import br.com.empresa.vo.enums.StatusEnum;
 
@@ -484,25 +486,52 @@ public class ConsultaProdutoView extends JDialog {
 				
 				BufferedReader bufferedReader = new BufferedReader(fileReader);
 				
+				OutputStream outputStream = new FileOutputStream(arquivoCSV, true);
+				OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, "ISO-8859-1");
+				
+				EntityManager em = HibernateUtil.getEntityManager();
+				
 				String linha = null;
 				int numLinha = 0;
-				
-				while((linha = bufferedReader.readLine()) != null) {
-					numLinha ++;
-					
-					if(numLinha != 1) {
-						//System.out.println(linha);
+				while(( linha = bufferedReader.readLine()) != null) {
+					numLinha++;
+					if(numLinha > 1) {
+						String[] particionamento = linha.split(";");
 						
-						String vetor[] = linha.split(";");
-						System.out.println("Nome:" + vetor[1].replaceAll("\\s+", " "));
-						System.out.println("Código barras:" + vetor[2]);
+						String descri = particionamento[0].replaceAll("\\s+", " ");
+						String codbar = particionamento[1].trim();
+
+						ClienteVO c = new ClienteVO();
+						c.setId(BigInteger.ONE);
 						
+						ProdutoVO produtoVO = new ProdutoVO();
+
+							produtoVO.setDescri(descri);
+							produtoVO.setCodbar(codbar);
+							produtoVO.setQtdest(new BigDecimal("0"));
+							produtoVO.setValcom(new BigDecimal("0"));
+							produtoVO.setValven(new BigDecimal("0"));
+							produtoVO.setStatus("I");
+							produtoVO.setClient(c);
+
+							try {
+								em.getTransaction().begin();
+								em.persist(produtoVO);
+								em.getTransaction().commit();
+							} catch (Exception e) {
+								e.printStackTrace();
+								em.getTransaction().rollback();
+							}
+						}
 					}
 					
-				}
+				
 				
 				fileReader.close();
 				bufferedReader.close();
+				em.close();
+				outputStreamWriter.close();
+				outputStream.close();
 				
 				
 			} catch (FileNotFoundException e) {			
