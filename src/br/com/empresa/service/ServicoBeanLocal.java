@@ -120,6 +120,8 @@ public class ServicoBeanLocal implements IServicoBeanLocal {
 	public void salvarProduto(ProdutoVO produtoVO) throws BOValidationException, BOException {
 
 		IProdutoBO produtoBO = new ProdutoBO();
+		
+		
 
 		produtoBO.salvarProduto(produtoVO);
 

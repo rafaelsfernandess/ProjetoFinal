@@ -8,7 +8,11 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAccessor;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -68,7 +72,7 @@ public class ProdutoView extends JDialog {
 
 		setBounds(100, 100, 466, 446);
 
-		//Coloca a tela no centro da janela.
+		// Coloca a tela no centro da janela.
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation(dim.width / 2 - this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
 		getContentPane().setLayout(null);
@@ -121,19 +125,19 @@ public class ProdutoView extends JDialog {
 		JLabel lbStatus = new JLabel("Status: *");
 		lbStatus.setBounds(12, 281, 109, 15);
 		getContentPane().add(lbStatus);
-		
+
 		JLabel lblFabricacao = new JLabel("Data Fabricação: *");
 		lblFabricacao.setBounds(12, 222, 98, 14);
 		getContentPane().add(lblFabricacao);
-		
+
 		JLabel lblValidade = new JLabel("Data Validade: *");
 		lblValidade.setBounds(12, 250, 84, 14);
 		getContentPane().add(lblValidade);
-		
+
 		JLabel lblLucro = new JLabel("Lucro: *");
 		lblLucro.setBounds(12, 191, 46, 14);
 		getContentPane().add(lblLucro);
-		
+
 		tfLucro = new JTextField();
 		tfLucro.setEnabled(false);
 		tfLucro.setBounds(128, 187, 86, 20);
@@ -144,22 +148,22 @@ public class ProdutoView extends JDialog {
 		cbStatus.setModel(new DefaultComboBoxModel(StatusEnum.values()));
 		cbStatus.setBounds(128, 276, 114, 24);
 		getContentPane().add(cbStatus);
-		
+
 		tfVlrCompra = new JTextField();
 		tfVlrCompra.setBounds(128, 129, 86, 20);
 		getContentPane().add(tfVlrCompra);
 		tfVlrCompra.setColumns(10);
-		
+
 		tfVlrVenda = new JTextField();
 		tfVlrVenda.setBounds(128, 157, 86, 20);
 		getContentPane().add(tfVlrVenda);
 		tfVlrVenda.setColumns(10);
-		
+
 		tfDtFabricacao = new JTextField();
 		tfDtFabricacao.setBounds(126, 219, 86, 20);
 		getContentPane().add(tfDtFabricacao);
 		tfDtFabricacao.setColumns(10);
-		
+
 		tfDtValidade = new JTextField();
 		tfDtValidade.setBounds(126, 247, 86, 20);
 		getContentPane().add(tfDtValidade);
@@ -168,7 +172,12 @@ public class ProdutoView extends JDialog {
 		JButton btnSalvar = new JButton("Salvar");
 		btnSalvar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				salvar();
+				try {
+					salvar();
+				} catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		btnSalvar.setBounds(208, 371, 117, 25);
@@ -182,95 +191,116 @@ public class ProdutoView extends JDialog {
 		});
 		btnFechar.setBounds(333, 371, 117, 25);
 		getContentPane().add(btnFechar);
-		
-		
+
 	}
 
-	private void salvar() {
-		
+	public int verificaData(String datfab, String datval) throws ParseException {
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+			Date date = formatter.parse(datfab);
+			Date date2 = formatter.parse(datval);
+
+			long diferenca = Math.abs(date2.getTime() - date.getTime());
+			long diff = TimeUnit.DAYS.convert(diferenca, TimeUnit.MILLISECONDS);
+			int dias = (int)(diferenca/(100*60*60*24));
+			if (dias > 365) {
+				return 1;
+			}else {
+				return 2;}
+
+	}
+
+	private void salvar() throws ParseException {
+
 		try {
-			
+
 			String codigo = tfcodigo.getText();
-			if(codigo.trim().length() > 0) {
+			if (codigo.trim().length() > 0) {
 				produtoVO.setId(new BigInteger(codigo));
 			}
-			
+
 			String descri = tfDescricao.getText();
 			produtoVO.setDescri(descri);
 
 			String vlrcom = tfVlrCompra.getText().trim();
 			vlrcom = vlrcom.replaceAll("\\.", "").replaceAll(",", ".");
-			if(vlrcom.length() > 1) {
+			if (vlrcom.length() > 1) {
 				BigDecimal vlrCompra = new BigDecimal(vlrcom);
 				produtoVO.setValcom(vlrCompra);
 			}
-			
+
 			String vlrven = tfVlrVenda.getText().trim();
 			vlrven = vlrven.replaceAll("\\.", "").replaceAll(",", ".");
-			if(vlrven.length() > 1) {
+			if (vlrven.length() > 1) {
 				BigDecimal vlrVenda = new BigDecimal(vlrven);
 				produtoVO.setValven(vlrVenda);
 			}
-			
+
 			String qtd = ftfQtd.getText().trim();
 			qtd = qtd.replaceAll("\\.", "").replaceAll(",", ".");
-			if(qtd.length() > 1) {
+			if (qtd.length() > 1) {
 				BigDecimal qtdest = new BigDecimal(qtd);
 				produtoVO.setQtdest(qtdest);
 			}
-			
+
 			String codbar = ftfCodBar.getText().trim();
-			if(codbar.length() > 0) {
+			if (codbar.length() > 0) {
 				produtoVO.setCodbar(codbar);
 			}
-			
-			StatusEnum status = (StatusEnum)cbStatus.getSelectedItem();
-			if(status != null) {
+
+			StatusEnum status = (StatusEnum) cbStatus.getSelectedItem();
+			if (status != null) {
 				produtoVO.setStatus(status.name());
 			}
-			
+
 			String datfab = tfDtFabricacao.getText().trim();
-			if(datfab != null) {
+			if (datfab != null) {
 				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 				try {
 					Date date = formatter.parse(datfab);
-					produtoVO.setDatfab(date); 
+					produtoVO.setDatfab(date);
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
+
 			}
-			
+
 			String datval = tfDtValidade.getText().trim();
-			if(datval != null) {
+			if (datval != null) {
 				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 				try {
-					Date date2 = formatter.parse(datval);	
+					Date date2 = formatter.parse(datval);
 					produtoVO.setDatval(date2);
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
+
 			}
-			
+
 			produtoVO.setClient(Dados.getClienteSelecionado());
 			
+			
+			if(verificaData(datfab, datval) == 1) {
+				JOptionPane.showMessageDialog(null, "Produto de longa duração");
+			}
+			
 			servicoBeanLocal.salvarProduto(produtoVO);
-			
+
 			tfcodigo.setText(produtoVO.getId().toString());
-			
+
 			consultaProdutoView.pesquisar();
-			
-			JOptionPane.showMessageDialog(this, "Operação realizada com sucesso!", "Mensagem de confirmação", JOptionPane.INFORMATION_MESSAGE);
-			
+
+			JOptionPane.showMessageDialog(this, "Operação realizada com sucesso!", "Mensagem de confirmação",
+					JOptionPane.INFORMATION_MESSAGE);
+
 		} catch (BOValidationException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(this, e.getMessage(), "Mensagem de alerta", JOptionPane.WARNING_MESSAGE);
 		} catch (BOException e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(this, "Ocorreu um erro ao realizar a operação!", "Mensagem de erro", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Ocorreu um erro ao realizar a operação!", "Mensagem de erro",
+					JOptionPane.ERROR_MESSAGE);
 		}
 
 	}
@@ -282,6 +312,8 @@ public class ProdutoView extends JDialog {
 		this.ftfCodBar.setText(produtoVO.getCodbar());
 		this.tfVlrCompra.setText(produtoVO.getValcom().toPlainString());
 		this.tfVlrVenda.setText(produtoVO.getValven().toPlainString());
+		this.tfDtValidade.setText(produtoVO.getValven().toPlainString());
+		this.tfDtFabricacao.setText(produtoVO.getValven().toPlainString());
 		this.ftfQtd.setText(produtoVO.getQtdest().toPlainString());
 
 	}
